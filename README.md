@@ -23,6 +23,7 @@ Because it really shouldn't be hard to have a safe and secure production cluster
   - [ ] TLS Certificates
 - [ ] Nomad
   - [x] HA via Consul (currently one instance)
+  - [ ] TLS Certificates
   - [ ] Add a serf a gossip key
   - [ ] Enable vault secret integration
   - [ ] Enable consul connect integration
