@@ -96,6 +96,8 @@ services:
       - nomad
     build:
       context: worker
+    deploy:
+      replicas: 3
     environment:
       CONSUL_BIND_INTERFACE: eth0
     configs:
