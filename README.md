@@ -28,7 +28,7 @@ Because it really shouldn't be hard to have a safe and secure production cluster
   - [ ] Enable vault secret integration
   - [ ] Enable consul connect integration
 - [x] Workers
-  - [ ] Support docker-in-docker
+  - [x] Support docker-in-docker
   - [x] Embedded consul agent
   - [x] Embedded nomad client
   - [ ] TLS Certificates
