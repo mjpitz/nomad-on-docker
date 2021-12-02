@@ -38,8 +38,6 @@ services:
       - agent
       - -config-dir
       - /etc/consul.d
-      - -client
-      - 0.0.0.0
 
   # vault - provides secrets management and secret engine support.
   vault:
