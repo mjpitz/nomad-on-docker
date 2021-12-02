@@ -16,7 +16,7 @@ Because it really shouldn't be hard to have a safe and secure production cluster
 - [ ] Consul
   - [x] HA (currently one instance)
   - [ ] TLS Certificates
-  - [ ] Add a serf a gossip key
+  - [ ] Add a serf gossip key
   - [ ] ACLs
 - [x] Vault
   - [x] HA via Consul (currently one instance)
@@ -24,7 +24,7 @@ Because it really shouldn't be hard to have a safe and secure production cluster
 - [ ] Nomad
   - [x] HA via Consul (currently one instance)
   - [ ] TLS Certificates
-  - [ ] Add a serf a gossip key
+  - [ ] Add a serf gossip key
   - [ ] Enable vault secret integration
   - [ ] Enable consul connect integration
 - [x] Workers
