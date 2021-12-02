@@ -16,16 +16,20 @@ Because it really shouldn't be hard to have a safe and secure production cluster
 - [ ] Consul
   - [x] HA (currently one instance)
   - [ ] TLS Certificates
-  - [ ] Add a serf gossip key
+  - [x] Add a serf gossip key
   - [ ] ACLs
 - [x] Vault
-  - [x] HA via Consul (currently one instance)
+  - [ ] HA via Consul (currently one instance)
   - [ ] TLS Certificates
 - [ ] Nomad
   - [x] HA via Consul (currently one instance)
   - [ ] TLS Certificates
-  - [ ] Add a serf gossip key
+  - [x] Add a serf gossip key
+  - [ ] ACLs
   - [ ] Enable vault secret integration
+    - https://learn.hashicorp.com/tutorials/nomad/vault-nomad-secrets
+    - https://learn.hashicorp.com/tutorials/nomad/vault-pki-nomad?in=nomad/integrate-vault
+    - https://learn.hashicorp.com/tutorials/nomad/vault-postgres?in=nomad/integrate-vault
   - [ ] Enable consul connect integration
 - [x] Workers
   - [x] Support docker-in-docker
