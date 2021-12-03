@@ -9,7 +9,7 @@ Eventually, it would be nice to have this do high availability as well as demons
 
 ## Why?
 
-Because it really shouldn't be hard to have a safe and secure production cluster.
+Because having a safe and secure production cluster shouldn't require a hard way.
 
 ## Status
 
