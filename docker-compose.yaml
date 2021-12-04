@@ -1,7 +1,8 @@
 version: "3.9"
 
 volumes:
-  docker-certs:
+  docker-certs: {}
+  docker-client-certs: {}
 
 configs:
   # consul config
@@ -25,13 +26,26 @@ configs:
     file: nomad/config-server.hcl
 
 services:
+  # minio - for asset distribution (optional)
+  minio:
+    image: minio/minio
+    ports:
+      - "9090:9090"
+    command:
+      - server
+      - /data
+      - --console-address
+      - ":9090"
+
+  # docker - for running nomad job containers
   docker:
     image: docker:dind
     privileged: true
     environment:
-      DOCKER_CERT_PATH: ""
+      DOCKER_CERT_PATH: "/certs"
     volumes:
-      - "docker-certs:/certs"
+      - docker-certs:/certs
+      - docker-client-certs:/certs/client
 
   # server - bundles consul, vault, and nomad into a single container
   # - consul runs a server process, forming a RAFT cluster
@@ -39,6 +53,8 @@ services:
   # - nomad starts a server process to schedule work within the cluster
   server:
     image: hashistack:latest
+    depends_on:
+      - docker
     build:
       context: hashistack
     privileged: true
@@ -53,14 +69,18 @@ services:
         target: /etc/nomad.d/common.hcl
       - source: nomad_server
         target: /etc/nomad.d/server.hcl
+    volumes:
+      - docker-client-certs:/certs/client:ro
     environment:
-      DOCKER_TLS_VERIFY: "0"
+      DOCKER_TLS_VERIFY: "1"
       DOCKER_HOST: tcp://docker:2376
-      DOCKER_CERT_PATH: ""
+      DOCKER_CERT_PATH: "/certs/client"
       CONSUL_BIND_INTERFACE: eth0
       VAULT_EXTRA_ARGS: "-dev"
       VAULT_DEV_ROOT_TOKEN_ID: badadmin
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      # need -dev to support DOCKER_ environment variables
+      NOMAD_EXTRA_ARGS: "-dev -bind=0.0.0.0 -client=false"
     ports:
       - "8500:8500"
       - "8200:8200"
@@ -90,7 +110,12 @@ services:
         target: /etc/nomad.d/common.hcl
       - source: nomad_client
         target: /etc/nomad.d/client.hcl
+    volumes:
+      - docker-client-certs:/certs/client:ro
     environment:
+      DOCKER_TLS_VERIFY: "1"
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: "/certs/client"
       CONSUL_BIND_INTERFACE: eth0
     cap_add:
       - NET_ADMIN

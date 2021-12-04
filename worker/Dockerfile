@@ -42,7 +42,7 @@ RUN apk update && apk add wget unzip bash ca-certificates libcap su-exec
 # nomad only seems to detect the latest java version
 # qemu install didn't work
 # docker integration seems to need the docker sock
-RUN apk openjdk11
+RUN apk add openjdk11
 
 ARG GLIBC_VERSION
 RUN apk del libc6-compat && \

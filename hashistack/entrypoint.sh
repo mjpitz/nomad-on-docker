@@ -31,13 +31,13 @@ function cleanup() {
 
 trap cleanup EXIT
 
-/consul/bin/consul agent -config-dir "${CONSUL_CONFIG_DIR}" &
+/consul/bin/consul agent ${CONSUL_EXTRA_ARGS} -config-dir "${CONSUL_CONFIG_DIR}" &
 consul_pid="$!"
 
-/vault/bin/vault server -config "${VAULT_CONFIG_DIR}" ${VAULT_EXTRA_ARGS} &
+/vault/bin/vault server ${VAULT_EXTRA_ARGS} -config "${VAULT_CONFIG_DIR}" &
 vault_pid="$!"
 
-/nomad/bin/nomad agent -config "${NOMAD_CONFIG_DIR}" &
+/nomad/bin/nomad agent ${NOMAD_EXTRA_ARGS} -config "${NOMAD_CONFIG_DIR}" &
 nomad_pid="$!"
 
 wait -n $nomad_pid $vault_pid $consul_pid
