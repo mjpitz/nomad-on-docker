@@ -25,6 +25,7 @@ services:
   # minio - for asset distribution (optional)
   minio:
     image: minio/minio
+    restart: always
     ports:
       - "9090:9090"
     command:
@@ -41,6 +42,7 @@ services:
     image: hashistack:latest
     build:
       context: hashistack
+    restart: always
     privileged: true
     configs:
       - source: consul_common
@@ -65,10 +67,34 @@ services:
       VAULT_DEV_ROOT_TOKEN_ID: badadmin
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
       # nomad configuration
-      # - need -dev to support DOCKER_ environment variables
       NOMAD_ENABLED: "true"
-      NOMAD_EXTRA_ARGS: "-client"
     ports:
       - "8500:8500"
       - "8200:8200"
       - "4646:4646"
+
+  worker:
+    image: hashistack:latest
+    build:
+      context: hashistack
+    deploy:
+      replicas: 3
+    restart: always
+    privileged: true
+    configs:
+      - source: consul_common
+        target: /etc/consul.d/common.hcl
+      - source: consul_agent
+        target: /etc/consul.d/agent.hcl
+      - source: nomad_common
+        target: /etc/nomad.d/common.hcl
+      - source: nomad_client
+        target: /etc/nomad.d/client.hcl
+    environment:
+      # additional runtimes
+      EXTRA_PACKAGES: "openjdk11"
+      # consul-configuration
+      CONSUL_ENABLED: "true"
+      CONSUL_BIND_INTERFACE: eth0
+      # nomad configuration
+      NOMAD_ENABLED: "true"

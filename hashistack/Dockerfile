@@ -1,4 +1,5 @@
 ARG ALPINE_VERSION=3.14
+ARG DOCKER_VERSION=20.10.11
 ARG TARGETOS=linux
 ARG TARGETARCH=amd64
 ARG CONSUL_VERSION=1.10.4
@@ -50,7 +51,7 @@ RUN mkdir -p /nomad/bin && \
 
 ##===
 ## ALL IN ONE
-FROM alpine:${ALPINE_VERSION}
+FROM docker:${DOCKER_VERSION}-dind-alpine${ALPINE_VERSION}
 
 RUN apk update && apk add wget unzip bash ca-certificates libcap su-exec && apk del libc6-compat
 
