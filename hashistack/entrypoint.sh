@@ -34,17 +34,11 @@ trap cleanup EXIT
 /consul/bin/consul agent -config-dir "${CONSUL_CONFIG_DIR}" &
 consul_pid="$!"
 
-## TODO: probe consul
-
 /vault/bin/vault server -config "${VAULT_CONFIG_DIR}" ${VAULT_EXTRA_ARGS} &
 vault_pid="$!"
 
-## TODO: probe vault
-
 /nomad/bin/nomad agent -config "${NOMAD_CONFIG_DIR}" &
 nomad_pid="$!"
-
-## TODO: probe nomad
 
 wait -n $nomad_pid $vault_pid $consul_pid
 exit $?

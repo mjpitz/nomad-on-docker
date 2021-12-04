@@ -9,7 +9,7 @@ mkdir -p "${NOMAD_CONFIG_DIR}"
 nomad_pid=""
 
 function cleanup() {
-  if [[ -n $nomad_pi ]]; then
+  if [[ -n $nomad_pid ]]; then
     pkill $nomad_pid
   fi
 
