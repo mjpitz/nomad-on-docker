@@ -32,7 +32,7 @@ Because having a safe and secure production cluster shouldn't require a hard way
     - https://learn.hashicorp.com/tutorials/nomad/vault-postgres?in=nomad/integrate-vault
   - [ ] Enable consul connect integration
 - [x] Workers
-  - [x] Support docker-in-docker
+  - [ ] Support docker-in-docker
   - [x] Embedded consul agent
   - [x] Embedded nomad client
   - [ ] TLS Certificates

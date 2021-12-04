@@ -1,5 +1,8 @@
 version: "3.9"
 
+volumes:
+  docker-certs:
+
 configs:
   # consul config
   consul_agent:
@@ -22,82 +25,62 @@ configs:
     file: nomad/config-server.hcl
 
 services:
-  # consul - provides service discovery, health checking, and routing support.
-  consul:
-    image: consul:1.10
+  docker:
+    image: docker:dind
+    privileged: true
     environment:
-      CONSUL_BIND_INTERFACE: eth0
+      DOCKER_CERT_PATH: ""
+    volumes:
+      - "docker-certs:/certs"
+
+  # server - bundles consul, vault, and nomad into a single container
+  # - consul runs a server process, forming a RAFT cluster
+  # - vault will run with consul as a backend and handle the administration of secrets
+  # - nomad starts a server process to schedule work within the cluster
+  server:
+    image: hashistack:latest
+    build:
+      context: hashistack
+    privileged: true
     configs:
       - source: consul_common
         target: /etc/consul.d/common.hcl
       - source: consul_server
         target: /etc/consul.d/server.hcl
-    ports:
-      - "8500:8500"
-    command:
-      - agent
-      - -config-dir
-      - /etc/consul.d
-
-  # vault - provides secrets management and secret engine support.
-  vault:
-    image: vault:1.9.0
-    depends_on:
-      - consul
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: badadmin
-      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
-    ports:
-      - "8200:8200"
-    configs:
       - source: vault_config
         target: /etc/vault.d/config.hcl
-    cap_add:
-      - IPC_LOCK
-    command:
-      - server
-      - -config
-      - /etc/vault.d/config.hcl
-      - -dev
-
-  # nomad - provides the nomad control plane component.
-  nomad:
-    image: nomad:latest
-    depends_on:
-      - consul
-      - vault
-    build:
-      context: nomad
-    ports:
-      - "4646:4646"
-    configs:
       - source: nomad_common
         target: /etc/nomad.d/common.hcl
       - source: nomad_server
         target: /etc/nomad.d/server.hcl
+    environment:
+      DOCKER_TLS_VERIFY: "0"
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: ""
+      CONSUL_BIND_INTERFACE: eth0
+      VAULT_EXTRA_ARGS: "-dev"
+      VAULT_DEV_ROOT_TOKEN_ID: badadmin
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    ports:
+      - "8500:8500"
+      - "8200:8200"
+      - "4646:4646"
     cap_add:
       - NET_ADMIN
       - SYS_ADMIN
-    command:
-      -  agent
-      - -config
-      - /etc/nomad.d
 
-  # worker - embeds a nomad client and a consul agent into the same container.
-  # - consul is used to auto-form the Nomad cluster
-  # - vault provides a CA for Consul connect and Secrets for Nomad
+  # worker - bundles consul and nomad into a single container
+  # - consul runs an agent process to track hosts
+  # - nomad runs a client process to receive workloads
   worker:
     image: worker:latest
     depends_on:
-      - consul
-      - vault
-      - nomad
+      - server
     build:
       context: worker
     deploy:
       replicas: 3
-    environment:
-      CONSUL_BIND_INTERFACE: eth0
+    privileged: true
     configs:
       - source: consul_common
         target: /etc/consul.d/common.hcl
@@ -107,6 +90,8 @@ services:
         target: /etc/nomad.d/common.hcl
       - source: nomad_client
         target: /etc/nomad.d/client.hcl
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
     cap_add:
       - NET_ADMIN
       - SYS_ADMIN
