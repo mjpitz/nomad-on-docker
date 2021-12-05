@@ -39,7 +39,7 @@ services:
   # - vault will run with consul as a backend and handle the administration of secrets
   # - nomad starts a server process to schedule work within the cluster
   server:
-    image: hashistack:latest
+    image: ghcr.io/mjpitz/hashistack:latest
     build:
       context: hashistack
     restart: always
@@ -57,6 +57,7 @@ services:
         target: /etc/nomad.d/server.hcl
     environment:
       # additional runtimes
+      DOCKER_ENABLED: true
       EXTRA_PACKAGES: "openjdk11"
       # consul-configuration
       CONSUL_ENABLED: "true"
@@ -74,7 +75,7 @@ services:
       - "4646:4646"
 
   worker:
-    image: hashistack:latest
+    image: ghcr.io/mjpitz/hashistack:latest
     build:
       context: hashistack
     deploy:
@@ -92,6 +93,7 @@ services:
         target: /etc/nomad.d/client.hcl
     environment:
       # additional runtimes
+      DOCKER_ENABLED: true
       EXTRA_PACKAGES: "openjdk11"
       # consul-configuration
       CONSUL_ENABLED: "true"

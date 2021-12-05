@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 readonly EXTRA_PACKAGES="${EXTRA_PACKAGES:-}"
+readonly DOCKER_ENABLED="${DOCKER_ENABLED:-}"
 
 readonly CONSUL_CONFIG_DIR="${CONSUL_CONFIG_DIR:-/etc/consul.d}"
 readonly CONSUL_ENABLED="${CONSUL_ENABLED:-}"
@@ -54,8 +55,10 @@ function cleanup() {
 
 trap cleanup EXIT
 
-/usr/local/bin/dockerd-entrypoint.sh &
-docker_pid="$!"
+if [[ -n "${DOCKER_ENABLED}" ]]; then
+  /usr/local/bin/dockerd-entrypoint.sh &
+  docker_pid="$!"
+fi
 
 if [[ -n "${CONSUL_ENABLED}" ]]; then
   /consul/bin/consul agent ${CONSUL_EXTRA_ARGS} -config-dir "${CONSUL_CONFIG_DIR}" &
@@ -72,5 +75,5 @@ if [[ -n "${NOMAD_ENABLED}" ]]; then
   nomad_pid="$!"
 fi
 
-wait -n $nomad_pid $vault_pid $consul_pid
+wait -n $nomad_pid $vault_pid $consul_pid $docker_pid
 exit $?
