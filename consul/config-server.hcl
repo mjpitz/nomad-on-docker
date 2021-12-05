@@ -1,3 +1,6 @@
 server = true
 bootstrap_expect = 1
-ui = true
+
+ui_config {
+  enabled = true
+}
