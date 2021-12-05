@@ -55,7 +55,7 @@ function cleanup() {
 
 trap cleanup EXIT
 
-if [[ -n "${DOCKER_ENABLED}" ]]; then
+if [[ -e /usr/local/bin/dockerd-entrypoint.sh ]] && [[ -n "${DOCKER_ENABLED}" ]]; then
   /usr/local/bin/dockerd-entrypoint.sh &
   docker_pid="$!"
 fi

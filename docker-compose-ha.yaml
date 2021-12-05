@@ -39,9 +39,7 @@ services:
   # - vault will run with consul as a backend and handle the administration of secrets
   # - nomad starts a server process to schedule work within the cluster
   server:
-    image: ghcr.io/mjpitz/hashistack:latest
-    build:
-      context: hashistack
+    image: ghcr.io/mjpitz/hashistack:latest-dind
     restart: always
     privileged: true
     configs:
@@ -75,9 +73,7 @@ services:
       - "4646:4646"
 
   worker:
-    image: ghcr.io/mjpitz/hashistack:latest
-    build:
-      context: hashistack
+    image: ghcr.io/mjpitz/hashistack:latest-dind
     deploy:
       replicas: 3
     restart: always
