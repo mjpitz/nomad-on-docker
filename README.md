@@ -58,3 +58,9 @@ currently unavailable for the HA configuration. To access the associated UI, you
 - Consul: http://localhost:8500
 - Vault: http://localhost:8200
 - Nomad: http://localhost:4646
+
+## Extra Packages
+
+The `ghcr.io/mjpitz/hashistack` container image accepts an `EXTRA_PACKAGES` environment variable that allows additional
+alpine packages to be installed. The value must be a space-separated list of package names. For example `openjdk11` will
+install openjdk version 11 prior to running the enabled processes.
