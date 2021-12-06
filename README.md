@@ -21,8 +21,8 @@ Because having a safe and secure production cluster shouldn't require a hard way
 - [x] Vault
   - [ ] HA
   - [ ] TLS Certificates
-- [ ] Nomad
-  - [ ] HA
+- [x] Nomad
+  - [x] HA
   - [x] Add a serf gossip key
     - Nomad's serf configuration is used to communicate over a WAN
   - [ ] Enable consul connect integration

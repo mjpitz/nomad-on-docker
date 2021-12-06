@@ -1,58 +1,47 @@
 version: "3.9"
 
+volumes:
+  minio_data: {}
+  consul_data: {}
+  nomad_data: {}
+
 configs:
   # consul config
   consul_agent:
-    file: consul/config-agent.hcl
-  consul_common:
-    file: consul/config-common.hcl
+    file: consul/agent.hcl
   consul_server:
-    file: consul/config-server.hcl
-
-  # vault config
-  vault_config:
-    file: vault/config.hcl
+    file: consul/server.hcl
 
   # nomad config
   nomad_client:
-    file: nomad/config-client.hcl
-  nomad_common:
-    file: nomad/config-common.hcl
+    file: nomad/client.hcl
   nomad_server:
-    file: nomad/config-server.hcl
+    file: nomad/server.hcl
 
 services:
   # minio - for asset distribution (optional)
   minio:
     image: minio/minio
-    ports:
-      - "9090:9090"
     command:
       - server
       - /data
       - --console-address
       - ":9090"
+    ports:
+      - "9090:9090"
+    restart: always
+    volumes:
+      - minio_data:/data
 
-  # server - bundles consul, vault, and nomad into a single container
-  # - consul runs a server process, forming a RAFT cluster
-  # - vault will run with consul as a backend and handle the administration of secrets
-  # - nomad starts a server process to schedule work within the cluster
   server:
     image: ghcr.io/mjpitz/hashistack:latest-dind
-    privileged: true
     configs:
-      - source: consul_common
-        target: /etc/consul.d/common.hcl
       - source: consul_server
         target: /etc/consul.d/server.hcl
-      - source: vault_config
-        target: /etc/vault.d/config.hcl
-      - source: nomad_common
-        target: /etc/nomad.d/common.hcl
       - source: nomad_server
         target: /etc/nomad.d/server.hcl
     environment:
-      # additional runtimes
+      # nomad runtimes
       DOCKER_ENABLED: true
       EXTRA_PACKAGES: "openjdk11"
       # consul-configuration
@@ -64,10 +53,14 @@ services:
       VAULT_DEV_ROOT_TOKEN_ID: badadmin
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
       # nomad configuration
-      # - need -dev to support DOCKER_ environment variables
       NOMAD_ENABLED: "true"
       NOMAD_EXTRA_ARGS: "-client"
+    privileged: true
     ports:
       - "8500:8500"
       - "8200:8200"
       - "4646:4646"
+    restart: always
+    volumes:
+      - consul_data:/data/consul
+      - nomad_data:/data/nomad
